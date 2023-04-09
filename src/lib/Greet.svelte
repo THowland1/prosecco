@@ -3,6 +3,8 @@
 	import type { UnicodeData } from './types';
 	import Input from './Input.svelte';
 	import { onMount } from 'svelte';
+	import { writeText } from '@tauri-apps/api/clipboard';
+	import { notifications } from './stores/toast';
 
 	let name = '';
 	let greetMsg = '';
@@ -47,6 +49,9 @@
 			console.log(e);
 		}
 	}
+	function unicode(code: string) {
+		return String.fromCodePoint(parseInt(code, 16));
+	}
 </script>
 
 <div class="select-none flex flex-col h-full">
@@ -65,9 +70,14 @@
 				<button
 					class="w-10 h-10 rounded-lg flex flex-col justify-center items-center hover:bg-neutral-700 cursor-default"
 					on:mouseenter={() => (selected = boop)}
+					on:click={async () => {
+						const str = unicode(boop.code_value);
+						await writeText(str);
+						notifications.success(`"${str}" copied to clipboard`, 2000);
+					}}
 				>
 					<div class="w-8 h-8 flex flex-col justify-center items-center">
-						{@html `&#x${boop.code_value}`}
+						{unicode(boop.code_value)}
 					</div>
 				</button>
 			{/each}
@@ -77,9 +87,33 @@
 		{#if selected}
 			<div class="flex items-center">
 				<div class="text-6xl mr-4 h-16 w-16 flex justify-center items-center">
-					{@html `&#x${selected.code_value}`}
+					{unicode(selected.code_value)}
 				</div>
-				<div class="flex-1 text-neutral-300"><div>{selected.character_name}</div></div>
+				<div class="flex-1 text-neutral-300">
+					<div>
+						{selected.character_name}
+					</div>
+
+					<div class="border-b border-gray-700" />
+					<div class="text-xs">
+						<div>
+							<span class="text-gray-500 uppercase">From hexcode</span>
+							{@html `&#x${selected.code_value};`}
+						</div>
+					</div>
+					<div class="text-xs">
+						<div>
+							<span class="text-gray-500 uppercase">From js</span>
+							{unicode(selected.code_value)}
+						</div>
+					</div>
+					<div class="text-xs">
+						<div>
+							<span class="text-gray-500 uppercase">Code value</span>
+							{selected.code_value}
+						</div>
+					</div>
+				</div>
 			</div>
 		{/if}
 	</div>
