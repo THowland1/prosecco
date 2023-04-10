@@ -2,13 +2,10 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-use diesel_migrations::{embed_migrations, EmbedMigrations};
+use diesel_migrations::embed_migrations;
 
-// use reqwest::Url;
-use tauri::App;
 // use schema::todos;
-use std::error::Error;
-use std::{error, string, sync::Mutex};
+use std::sync::Mutex; // makes object of this class json serializable, we will convert these objects to json and send to user.
 
 #[macro_use]
 extern crate diesel;
@@ -54,6 +51,5 @@ fn unicode_data_list(state: tauri::State<AppState>, params: QueryRequest) -> Str
 }
 
 struct AppState {
-    count: Mutex<i64>,
     conn: Mutex<SqliteConnection>,
 }

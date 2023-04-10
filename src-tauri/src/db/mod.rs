@@ -1,10 +1,7 @@
 extern crate dotenv;
 
 pub mod models;
-use crate::schema::{
-    unicode_data::{character_name, code_value},
-    *,
-};
+use crate::schema::{unicode_data::character_name, *};
 use diesel::prelude::*;
 use dotenv::dotenv;
 use models::UnicodeData;
